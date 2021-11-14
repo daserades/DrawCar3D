@@ -17,13 +17,13 @@ public class GameManager : MonoBehaviour
     private void OnEnable()
     {
         FinishPoint.levelCompleted += FinishPoint_levelCompleted;
-        DrawnBody.newBodyCreated += DrawnBody_newBodyCreated;
+        DrawLine.newBodyCreated += DrawnBody_newBodyCreated;
     }
 
     private void OnDisable()
     {
         FinishPoint.levelCompleted -= FinishPoint_levelCompleted;
-        DrawnBody.newBodyCreated -= DrawnBody_newBodyCreated;
+        DrawLine.newBodyCreated -= DrawnBody_newBodyCreated;
     }
 
     private void DrawnBody_newBodyCreated(DrawnBody NewDrawnBody)

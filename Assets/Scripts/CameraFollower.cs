@@ -4,16 +4,16 @@ using UnityEngine;
 
 public class CameraFollower : MonoBehaviour
 {
-    Transform target;
+    [SerializeField]Transform target;
 
     private void OnEnable()
     {
-        DrawnBody.newBodyCreated += DrawnBody_newBodyCreated;
+        DrawLine.newBodyCreated += DrawnBody_newBodyCreated;
     }
 
     private void OnDisable()
     {
-        DrawnBody.newBodyCreated -= DrawnBody_newBodyCreated;
+        DrawLine.newBodyCreated -= DrawnBody_newBodyCreated;
     }
 
     private void DrawnBody_newBodyCreated(DrawnBody NewDrawnBody)

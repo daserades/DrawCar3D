@@ -13,12 +13,12 @@ public class SpriteScroller : MonoBehaviour
 
     private void OnEnable()
     {
-        DrawnBody.newBodyCreated += DrawnBody_newBodyCreated;
+        DrawLine.newBodyCreated += DrawnBody_newBodyCreated;
     }
 
     private void OnDisable()
     {
-        DrawnBody.newBodyCreated -= DrawnBody_newBodyCreated;
+        DrawLine.newBodyCreated -= DrawnBody_newBodyCreated;
     }
 
     private void DrawnBody_newBodyCreated(DrawnBody NewDrawnBody)

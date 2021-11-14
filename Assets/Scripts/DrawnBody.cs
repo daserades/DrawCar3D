@@ -5,11 +5,8 @@ using System.Linq;
 
 public class DrawnBody : MonoBehaviour
 {
-    public delegate void NewBodyCreated(DrawnBody NewDrawnBody);
-    public static event NewBodyCreated newBodyCreated;
-
-    [SerializeField] private List<Transform> bodyParts;
-    public List<Transform> BodyParts { get { return bodyParts; } }
+    [SerializeField] private List<Transform> carParts;
+    public List<Transform> CarParts { get { return carParts; } }
 
     Transform firstPart, lastPart;
 
@@ -21,32 +18,26 @@ public class DrawnBody : MonoBehaviour
 
     [SerializeField] Rigidbody rigidBody;
 
-    public bool isDead = false;
-
     void Awake()
     {
-        bodyParts = new List<Transform>();
+        carParts = new List<Transform>();
         wheelPrefab = Resources.Load<GameObject>("Wheel");
-
-        if (newBodyCreated != null)
-        {
-            newBodyCreated(this);
-        }
     }
 
     public void ActivateBodyParts()
     {
         rigidBody = GetComponent<Rigidbody>();
 
-        foreach (Transform part in bodyParts)
+        foreach (Transform part in carParts)
         {
             part.gameObject.SetActive(true);
-            part.position = new Vector3(part.transform.position.x, part.transform.position.y + 5, 0);
+            part.position = new Vector3(part.transform.position.x, part.transform.position.y, 0);
         }
-        if (bodyParts.Last() && bodyParts.First())
+
+        if (carParts.Last() && carParts.First())
         {
-            lastPart = bodyParts.Last();
-            firstPart = bodyParts.First();
+            lastPart = carParts.Last();
+            firstPart = carParts.First();
 
             // TODO: edit magic numbers
             Vector3 frontLeftWheelPosition = new Vector3(lastPart.position.x, lastPart.position.y - lastPart.localScale.y, lastPart.position.z - wheelPrefab.transform.localScale.z * .5f);

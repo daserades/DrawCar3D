@@ -4,7 +4,7 @@ public class SlowMotion : MonoBehaviour
 {
     public void StartSlowMotionEffect()
     {
-        Time.timeScale = 0.2f;
+        Time.timeScale = 0f;
         Time.fixedDeltaTime = 0.02F * Time.timeScale;
     }
 

@@ -5,23 +5,26 @@ using UnityEngine.EventSystems;
 
 public class DrawLine : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler, IPointerEnterHandler
 {
+    public delegate void NewBodyCreated(DrawnBody NewDrawnBody);
+    public static event NewBodyCreated newBodyCreated;
+
     [SerializeField] Material lineMaterial;
     [SerializeField] Camera cam;
     [SerializeField] Transform meshPartPrefab;
 
     GameObject line;
-    GameObject body;
-    Transform lastInstantiatedCollider;
+    GameObject car;
+    [SerializeField] Transform lastInstantiatedCarPart;
     GameObject oldCar;
     SlowMotion slowMotion;
 
     LineRenderer lineRenderer;
-    [SerializeField] DrawnBody drawnBody;
+    [SerializeField] DrawnBody drawnCar;
 
     bool startDrawing;
     int currentIndex;
 
-    Vector3 currentCarPosition;
+    Vector3 lastCarPosition;
 
     [SerializeField] float distanceBetweenMeshParts;
 
@@ -34,24 +37,25 @@ public class DrawLine : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        slowMotion.StartSlowMotionEffect();
+
         line = new GameObject();
         line.name = "Line";
 
-        if (body)
+        if (car)
         {
-            currentCarPosition = body.transform.position;
-            oldCar = body;
-            body = new GameObject();
-            body.name = "Body";
-            drawnBody = body.AddComponent<DrawnBody>();
-
+            lastCarPosition = car.transform.position;
+            oldCar = car;
+            car = new GameObject();
+            car.name = "Body";
+            drawnCar = car.AddComponent<DrawnBody>();
+            car.transform.position = new Vector3(lastCarPosition.x, lastCarPosition.y, lastCarPosition.z);
         }
         else
         {
-            body = new GameObject();
-            body.name = "Body";
-            drawnBody = body.AddComponent<DrawnBody>();
-
+            car = new GameObject();
+            car.name = "Body";
+            drawnCar = car.AddComponent<DrawnBody>();
         }
 
         startDrawing = true;
@@ -64,26 +68,23 @@ public class DrawLine : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
 
     public void OnPointerUp(PointerEventData eventData)
     {
+        slowMotion.StopSlowMotionEffect();
         startDrawing = false;
 
-        if (drawnBody != null)
+        // check, if car has sufficient amount body part
+        if (drawnCar != null && car.transform.GetChildCount() > 2)
         {
-            if (drawnBody.transform.GetChildCount() > 3)
-            {
+            Rigidbody meshRB = car.AddComponent<Rigidbody>();
+            meshRB.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezePositionZ;
+            meshRB.mass = 400f;
 
-                Rigidbody meshRB = body.AddComponent<Rigidbody>();
-                meshRB.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezePositionZ;
-                meshRB.mass = 400f;
+            drawnCar.ActivateBodyParts();
+            car.transform.position = new Vector3(car.transform.position.x, car.transform.position.y + 5, 0);
 
-                drawnBody.ActivateBodyParts();
-                drawnBody.transform.position = new Vector3(currentCarPosition.x, currentCarPosition.y + 2.5f, drawnBody.transform.position.z);
-
-                Destroy(lastInstantiatedCollider.gameObject);
-            }
+            Destroy(lastInstantiatedCarPart.gameObject);
         }
 
         lineRenderer.useWorldSpace = false;
-
 
         if (line)
         {
@@ -94,8 +95,12 @@ public class DrawLine : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
             Destroy(oldCar);
         }
 
-
         currentIndex = 0;
+
+        if (newBodyCreated != null)
+        {
+            newBodyCreated(drawnCar);
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -117,35 +122,22 @@ public class DrawLine : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
     {
         if (startDrawing)
         {
-            slowMotion.StartSlowMotionEffect();
 
             Vector3 distance = mousePos - Input.mousePosition;
             float distanceSqrMagnitude = distance.sqrMagnitude;
 
             if (distanceSqrMagnitude > distanceBetweenMeshParts)
             {
-                lineRenderer.SetPosition(currentIndex, cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z + 10f)));
+                lineRenderer.SetPosition(currentIndex, cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z + 8f)));
 
-                if (lastInstantiatedCollider != null)
+                if (lastInstantiatedCarPart != null)
                 {
-                    Vector3 currentLinePos = lineRenderer.GetPosition(currentIndex);
-                    lastInstantiatedCollider.gameObject.SetActive(false);
-                    drawnBody.BodyParts.Add(lastInstantiatedCollider);
-
-                    lastInstantiatedCollider.LookAt(currentLinePos);
-
-                    if (lastInstantiatedCollider.rotation.y == 0)
-                    {
-                        //  lastInstantiatedCollider.eulerAngles = new Vector3(lastInstantiatedCollider.rotation.eulerAngles.x, 90, lastInstantiatedCollider.rotation.eulerAngles.z);
-                    }
-
-                    // lastInstantiatedCollider.localScale = new Vector3(lastInstantiatedCollider.localScale.x, lastInstantiatedCollider.localScale.y, lastInstantiatedCollider.localScale.z);
-
+                    drawnCar.CarParts.Add(lastInstantiatedCarPart);
                 }
 
-                lastInstantiatedCollider = Instantiate(meshPartPrefab, lineRenderer.GetPosition(currentIndex), Quaternion.identity, body.transform);
+                lastInstantiatedCarPart = Instantiate(meshPartPrefab, lineRenderer.GetPosition(currentIndex), Quaternion.identity, car.transform);
 
-                lastInstantiatedCollider.gameObject.SetActive(false);
+                lastInstantiatedCarPart.gameObject.SetActive(false);
 
                 mousePos = Input.mousePosition;
 
@@ -153,13 +145,8 @@ public class DrawLine : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
 
                 lineRenderer.positionCount = currentIndex + 1;
 
-                lineRenderer.SetPosition(currentIndex, cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z + 10f)));
-
+                lineRenderer.SetPosition(currentIndex, cam.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, Input.mousePosition.z + 8f)));
             }
-        }
-        else
-        {
-            slowMotion.StopSlowMotionEffect();
         }
     }
 }
