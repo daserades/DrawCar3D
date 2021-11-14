@@ -5,7 +5,6 @@ using UnityEngine.EventSystems;
 
 public class DrawLine : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IPointerExitHandler, IPointerEnterHandler
 {
-    // Components
     [SerializeField] Material lineMaterial;
     [SerializeField] Camera cam;
     [SerializeField] Transform meshPartPrefab;
@@ -13,6 +12,8 @@ public class DrawLine : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
     GameObject line;
     GameObject body;
     Transform lastInstantiatedCollider;
+    GameObject oldCar;
+    SlowMotion slowMotion;
 
     LineRenderer lineRenderer;
     [SerializeField] DrawnBody drawnBody;
@@ -20,11 +21,16 @@ public class DrawLine : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
     bool startDrawing;
     int currentIndex;
 
-    Vector3 temp;
+    Vector3 currentCarPosition;
 
     [SerializeField] float distanceBetweenMeshParts;
 
     Vector3 mousePos;
+
+    private void Awake()
+    {
+        slowMotion = new SlowMotion();
+    }
 
     public void OnPointerDown(PointerEventData eventData)
     {
@@ -33,8 +39,8 @@ public class DrawLine : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
 
         if (body)
         {
-            temp = body.transform.position;
-            Destroy(body);
+            currentCarPosition = body.transform.position;
+            oldCar = body;
             body = new GameObject();
             body.name = "Body";
             drawnBody = body.AddComponent<DrawnBody>();
@@ -52,7 +58,7 @@ public class DrawLine : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
         mousePos = Input.mousePosition;
 
         lineRenderer = line.AddComponent<LineRenderer>();
-        lineRenderer.startWidth = .2f;
+        lineRenderer.startWidth = .1f;
         lineRenderer.material = lineMaterial;
     }
 
@@ -70,7 +76,7 @@ public class DrawLine : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
                 meshRB.mass = 400f;
 
                 drawnBody.ActivateBodyParts();
-                drawnBody.transform.position = new Vector3(temp.x, temp.y + 5f, drawnBody.transform.position.z);
+                drawnBody.transform.position = new Vector3(currentCarPosition.x, currentCarPosition.y + 2.5f, drawnBody.transform.position.z);
 
                 Destroy(lastInstantiatedCollider.gameObject);
             }
@@ -83,6 +89,11 @@ public class DrawLine : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
         {
             Destroy(line);
         }
+        if (oldCar)
+        {
+            Destroy(oldCar);
+        }
+
 
         currentIndex = 0;
     }
@@ -106,8 +117,8 @@ public class DrawLine : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
     {
         if (startDrawing)
         {
+            slowMotion.StartSlowMotionEffect();
 
-            Time.timeScale = 0.4f;
             Vector3 distance = mousePos - Input.mousePosition;
             float distanceSqrMagnitude = distance.sqrMagnitude;
 
@@ -148,9 +159,7 @@ public class DrawLine : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
         }
         else
         {
-            Time.timeScale = 1f;
+            slowMotion.StopSlowMotionEffect();
         }
     }
-
-
 }
