@@ -4,11 +4,21 @@ using UnityEngine;
 
 public class CheckPoint : MonoBehaviour
 {
-    [SerializeField] CheckPointManager checkPointManager;
+    CheckPointManager checkPointManager;
 
     private void Awake()
     {
-        checkPointManager = GetComponentInParent<CheckPointManager>();
+        if (!checkPointManager)
+        {
+            if (GetComponentInParent<CheckPointManager>())
+            {
+                checkPointManager = GetComponentInParent<CheckPointManager>();
+            }
+            else
+            {
+                checkPointManager = FindObjectOfType<CheckPointManager>();
+            }
+        }
     }
 
     private void OnTriggerEnter(Collider other)

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class RoadCollider : MonoBehaviour
 {
+    // Pre-prepped meshes with Path Creator assets don't have a collider,
+    // this script solves this problem
     void Awake()
     {
         if (!GetComponent<Rigidbody>())
@@ -11,6 +13,7 @@ public class RoadCollider : MonoBehaviour
             var rb = gameObject.AddComponent<Rigidbody>();
             rb.isKinematic = true;
         }
+
         if (!GetComponent<MeshCollider>())
         {
             var meshCollider = gameObject.AddComponent<MeshCollider>();

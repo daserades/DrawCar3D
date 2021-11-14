@@ -11,7 +11,6 @@ public class FinishPoint : MonoBehaviour
     {
         if (other.GetComponentInParent<DrawnBody>())
         {
-            Debug.Log("123");
             levelCompleted?.Invoke();
         }
     }

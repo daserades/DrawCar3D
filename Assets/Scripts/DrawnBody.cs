@@ -48,6 +48,7 @@ public class DrawnBody : MonoBehaviour
             lastPart = bodyParts.Last();
             firstPart = bodyParts.First();
 
+            // TODO: edit magic numbers
             Vector3 frontLeftWheelPosition = new Vector3(lastPart.position.x, lastPart.position.y - lastPart.localScale.y, lastPart.position.z - wheelPrefab.transform.localScale.z * .5f);
             Vector3 frontRightWheelPosition = new Vector3(lastPart.position.x, lastPart.position.y - lastPart.localScale.y, lastPart.position.z + wheelPrefab.transform.localScale.z * .5f);
             Vector3 backLeftWheelPosition = new Vector3(firstPart.position.x, firstPart.position.y - firstPart.localScale.y, lastPart.position.z - wheelPrefab.transform.localScale.z * .5f);
@@ -98,7 +99,8 @@ public class DrawnBody : MonoBehaviour
 
     public void ReturnCheckPoint(Transform checkPointPosition)
     {
-        transform.position = new Vector3(checkPointPosition.position.x, checkPointPosition.position.y + 5, transform.position.z);
+        float offsetY = 2.5f;
+        transform.position = new Vector3(checkPointPosition.position.x, checkPointPosition.position.y + offsetY, transform.position.z);
         rigidBody.velocity = Vector3.zero;
         transform.rotation = Quaternion.Euler(Vector3.zero);
     }

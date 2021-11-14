@@ -8,7 +8,10 @@ public class DeathZone : MonoBehaviour
 
     private void Awake()
     {
-        checkPointManager = FindObjectOfType<CheckPointManager>();
+        if (checkPointManager == null)
+        {
+            checkPointManager = FindObjectOfType<CheckPointManager>();
+        }
     }
 
     private void OnTriggerEnter(Collider other)
