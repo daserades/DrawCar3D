@@ -122,7 +122,6 @@ public class DrawLine : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
     {
         if (startDrawing)
         {
-
             Vector3 distance = mousePos - Input.mousePosition;
             float distanceSqrMagnitude = distance.sqrMagnitude;
 
