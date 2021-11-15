@@ -72,7 +72,7 @@ public class DrawLine : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
         startDrawing = false;
 
         // check, if car has sufficient amount body part
-        if (drawnCar != null && car.transform.GetChildCount() > 2)
+        if (drawnCar != null && car.transform.childCount > 2)
         {
             Rigidbody meshRB = car.AddComponent<Rigidbody>();
             meshRB.constraints = RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationY | RigidbodyConstraints.FreezePositionZ;
