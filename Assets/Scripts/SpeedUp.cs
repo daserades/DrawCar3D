@@ -6,6 +6,9 @@ public class SpeedUp : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        other.GetComponentInParent<Rigidbody>().AddForce(Vector3.right * 4000);
+        if (other.GetComponentInParent<DrawnBody>())
+        {
+            other.GetComponentInParent<Rigidbody>().AddForce(Vector3.right * 4000);
+        }
     }
 }

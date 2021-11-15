@@ -8,6 +8,14 @@ public class CheckPointManager : MonoBehaviour
     [SerializeField] private Transform startPoint;
     [SerializeField] private Transform finishPoint;
 
+    private void Awake()
+    {
+        if(activeCheckPoint == null)
+        {
+            activeCheckPoint = startPoint;
+        }
+    }
+
     public void SetActiveCheckPoint(Transform checkPoint)
     {
         activeCheckPoint = checkPoint;
